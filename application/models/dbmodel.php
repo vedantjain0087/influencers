@@ -113,4 +113,50 @@ class Dbmodel extends CI_Model
         $query = $this->db->get();
         return $query->result();
     }
+
+    public function apply_for_campaign($email, $campaign_id)
+    {
+        $data = array(
+            'campaign_id' => $campaign_id,
+            'user_email' => $email,
+            'applied' => 'yes'
+        );
+        $this->db->insert('user_live_campaign_stats',$data);
+        return true;
+    }
+
+    public function approve_for_campaign($email, $campaign_id){
+        $data = array(
+            'applied' => 'no',
+          'approved' => 'yes'
+          );
+              $this->db->where('user_email',$email);
+              $this->db->where('campaign_id',$campaign_id);
+              $this->db->update('user_live_campaign_stats',$data);
+              return true;
+      }
+
+      public function submit_for_campaign($email, $campaign_id){
+        $data = array(
+          'approved' => 'no',
+          "submitted" => 'yes'
+          );
+              $this->db->where('user_email',$email);
+              $this->db->where('campaign_id',$campaign_id);
+              $this->db->update('user_live_campaign_stats',$data);
+              return true;
+      }
+
+      public function complete_for_campaign($email, $campaign_id){
+        $data = array(
+            'submitted' => 'no',
+          'completed' => 'yes'
+          );
+              $this->db->where('user_email',$email);
+              $this->db->where('campaign_id',$campaign_id);
+              $this->db->update('user_live_campaign_stats',$data);
+              return true;
+      }
+      
+
 }
