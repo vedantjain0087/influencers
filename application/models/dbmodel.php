@@ -161,4 +161,38 @@ class Dbmodel extends CI_Model
         return true;
     }
 
+    public function add_connection($from, $to)
+    {
+        $data = array(
+            'user1' => $from,
+            'user2' => $to,
+        );
+        $this->db->insert('connections', $data);
+        return true;
+    }
+    public function explore()
+    {
+        $this->db->select('fullname, email, mobile, gender, state, city, profile_picture, primary_foi, secondary_foi_1, secondary_foi_2, instagram, facebook');
+        $query = $this->db->get('users');
+        return $query->result();
+    }
+
+    public function profile($email)
+    {
+        $this->db->select('fullname, email, mobile, gender, state, city, profile_picture, primary_foi, secondary_foi_1, secondary_foi_2, instagram, facebook');
+        $this->db->where('email', $email);
+        $query = $this->db->get('users');
+        return $query->result();
+    }
+
+    public function update_password($email, $new_pass)
+    {
+        $data = array(
+            'password' => $new_pass
+        );
+        $this->db->where('email', $email);
+        $this->db->update('users', $data);
+        return true;
+    }
+
 }

@@ -227,10 +227,54 @@ class Main extends CI_Controller
         }
     }
 
-    public function applied_campaigns()
+    public function add_connection()
     {
-        $email = $this->input->post('email');
-        $res = $this->dbmodel->applied_campaigns($email);
-        var_dump($res);
+        $from = $this->session->userdata('email');
+        $to = $this->input->post('to');
+        $if_done = $this->dbmodel->add_connection($from, $to);
+        if (!$if_done) {
+            echo ("success");
+            // $this->session->set_flashdata('complete_for_campaign_message', 'There was some error in storing data!');
+            // redirect(base_url('index.php/main/complete_for_campaign'));
+        } else {
+            echo ("error");
+            // $this->session->set_flashdata('complete_for_campaign_message', 'Campaign completed successfully');
+            // redirect(base_url('index.php/main/complete_for_campaign'));
+        }
     }
+
+    public function explore()
+    {
+        $passdate['profiles'] = $this->dbmodel->explore();
+        $this->load->view('explore', $passdata);
+    }
+
+    public function profile()
+    {
+        $email = $this->session->userdata('email');
+        $passdate['user_profile'] = $this->dbmodel->profile($email);
+        $this->load->view('profile', $passdata);
+    }
+
+    public function update_password()
+    {
+        $email = $this->session->userdata('email');
+        $new_pass = $this->input->post('new_pass');
+        $if_done = $this->dbmodel->update_password($email, $new_pass);
+        if (!$if_done) {
+            echo ("success");
+            // $this->session->set_flashdata('complete_for_campaign_message', 'There was some error in storing data!');
+            // redirect(base_url('index.php/main/complete_for_campaign'));
+        } else {
+            echo ("error");
+            // $this->session->set_flashdata('complete_for_campaign_message', 'Campaign completed successfully');
+            // redirect(base_url('index.php/main/complete_for_campaign'));
+        }
+    }
+    // public function applied_campaigns()
+    // {
+    //     // $email = $this->input->post('email');
+    //     $res = $this->dbmodel->explore();
+    //     var_dump($res);
+    // }
 }
