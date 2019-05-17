@@ -119,44 +119,46 @@ class Dbmodel extends CI_Model
         $data = array(
             'campaign_id' => $campaign_id,
             'user_email' => $email,
-            'applied' => 'yes'
+            'applied' => 'yes',
         );
-        $this->db->insert('user_live_campaign_stats',$data);
+        $this->db->insert('user_live_campaign_stats', $data);
         return true;
     }
 
-    public function approve_for_campaign($email, $campaign_id){
+    public function approve_for_campaign($email, $campaign_id)
+    {
         $data = array(
             'applied' => 'no',
-          'approved' => 'yes'
-          );
-              $this->db->where('user_email',$email);
-              $this->db->where('campaign_id',$campaign_id);
-              $this->db->update('user_live_campaign_stats',$data);
-              return true;
-      }
+            'approved' => 'yes',
+        );
+        $this->db->where('user_email', $email);
+        $this->db->where('campaign_id', $campaign_id);
+        $this->db->update('user_live_campaign_stats', $data);
+        return true;
+    }
 
-      public function submit_for_campaign($email, $campaign_id){
+    public function submit_for_campaign($email, $campaign_id)
+    {
         $data = array(
-          'approved' => 'no',
-          "submitted" => 'yes'
-          );
-              $this->db->where('user_email',$email);
-              $this->db->where('campaign_id',$campaign_id);
-              $this->db->update('user_live_campaign_stats',$data);
-              return true;
-      }
+            'approved' => 'no',
+            "submitted" => 'yes',
+        );
+        $this->db->where('user_email', $email);
+        $this->db->where('campaign_id', $campaign_id);
+        $this->db->update('user_live_campaign_stats', $data);
+        return true;
+    }
 
-      public function complete_for_campaign($email, $campaign_id){
+    public function complete_for_campaign($email, $campaign_id)
+    {
         $data = array(
             'submitted' => 'no',
-          'completed' => 'yes'
-          );
-              $this->db->where('user_email',$email);
-              $this->db->where('campaign_id',$campaign_id);
-              $this->db->update('user_live_campaign_stats',$data);
-              return true;
-      }
-      
+            'completed' => 'yes',
+        );
+        $this->db->where('user_email', $email);
+        $this->db->where('campaign_id', $campaign_id);
+        $this->db->update('user_live_campaign_stats', $data);
+        return true;
+    }
 
 }
