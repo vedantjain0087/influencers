@@ -20,6 +20,10 @@ class Main extends CI_Controller
         //load model
         $this->load->model('dbmodel');
     }
+    public function index()
+    {
+        echo ("welcome");
+    }
 
     public function send_email($receiver_email, $receiver_name)
     {
@@ -159,7 +163,7 @@ class Main extends CI_Controller
         $passdata['approved_campaigns'] = $this->dbmodel->approved_campaigns($email);
         $passdata['submitted_campaign'] = $this->dbmodel->submitted_campaign($email);
         $passdata['completed_campaigns'] = $this->dbmodel->completed_campaigns($email);
-        $this->load->view('campaign_page',$passdata);
+        $this->load->view('campaign_page', $passdata);
     }
 
     //Code For Dealing operation on Live campaigns
@@ -217,11 +221,16 @@ class Main extends CI_Controller
         if (!$if_done) {
             $this->session->set_flashdata('complete_for_campaign_message', 'There was some error in storing data!');
             redirect(base_url('index.php/main/complete_for_campaign'));
-
         } else {
             $this->session->set_flashdata('complete_for_campaign_message', 'Campaign completed successfully');
             redirect(base_url('index.php/main/complete_for_campaign'));
         }
     }
 
+    public function applied_campaigns()
+    {
+        $email = $this->input->post('email');
+        $res = $this->dbmodel->applied_campaigns($email);
+        var_dump($res);
+    }
 }
