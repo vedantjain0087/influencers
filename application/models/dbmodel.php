@@ -7,6 +7,19 @@ class Dbmodel extends CI_Model
         parent::__construct();
     }
 
+    public function login($email, $password)
+    {
+        $this->db->select('fullname, email, mobile, gender, state, city, profile_picture, primary_foi, secondary_foi_1, secondary_foi_2, instagram, facebook');
+        $this->db->where('email', $email);
+        $this->db->where('password', $password);
+        $query = $this->db->get('users');
+        if ($query->num_rows()) {
+            return $query->result();
+        } else {
+            return false;
+        }
+    }
+
     public function if_user_exist($email)
     {
         $query = $this->db->where(['email' => $email])->get('users');
@@ -163,32 +176,71 @@ class Dbmodel extends CI_Model
 
     public function add_connection($from, $to)
     {
-        $data = array(
-            'user1' => $from,
-            'user2' => $to,
-        );
-        $this->db->insert('connections', $data);
+        $this->db->select('*');
+        $this->db->from('connections');
+        $this->db->where('user1 =', $from);
+        $this->db->where('user2 =', $to);
+        $this->db->or_where('user1 =', $to);
+        $this->db->where('user2 =', $from);
+        $query = $this->db->get();
+        if (!$query->num_rows()) {
+            $data = array(
+                'user1' => $from,
+                'user2' => $to,
+            );
+            $this->db->insert('connections', $data);
+            return true;
+        }
         return true;
+
     }
-    public function explore()
+    public function explore($email)
     {
+        $this->db->from('users');
+        $this->db->where('email !=', $email);
         $this->db->select('fullname, email, mobile, gender, state, city, profile_picture, primary_foi, secondary_foi_1, secondary_foi_2, instagram, facebook');
-        $query = $this->db->get('users');
+        $query = $this->db->get();
+        return $query->result();
+    }
+
+    public function connections($email)
+    {
+        $this->db->from('connections');
+        $this->db->where('user1 =', $email);
+        $this->db->or_where('user2 =', $email);
+        $query = $this->db->get();
         return $query->result();
     }
 
     public function profile($email)
     {
-        $this->db->select('fullname, email, mobile, gender, state, city, profile_picture, primary_foi, secondary_foi_1, secondary_foi_2, instagram, facebook');
+        $this->db->select('fullname, email, ,description, mobile, gender, state, city, profile_picture, primary_foi, secondary_foi_1, secondary_foi_2, instagram, facebook');
         $this->db->where('email', $email);
         $query = $this->db->get('users');
         return $query->result();
     }
 
+    public function update_profile($email, $fullname, $mobile, $city, $state, $primary_foi, $secondary_foi_1, $secondary_foi_2, $description)
+    {
+        $data = array(
+            'fullname' => $fullname,
+            'mobile' => $mobile,
+            'city' => $city,
+            'state' => $state,
+            'primary_foi' => $primary_foi,
+            'secondary_foi_1' => $secondary_foi_1,
+            'secondary_foi_2' => $secondary_foi_2,
+            'description' => $description
+        );
+        $this->db->where('email', $email);
+        $this->db->update('users', $data);
+        return true;
+    }
+
     public function update_password($email, $new_pass)
     {
         $data = array(
-            'password' => $new_pass
+            'password' => $new_pass,
         );
         $this->db->where('email', $email);
         $this->db->update('users', $data);

@@ -92,18 +92,32 @@ class Main extends CI_Controller
     {
         if ($this->session->userdata('email')) {
             $searchuser = $this->session->userdata('email');
-
+            redirect(base_url('index.php/main/dashboard'));
             //Do Something here
         } else {
             $click = $this->input->post('submit');
             if ($click) {
-                $this->session->set_userdata('email', $this->input->post('email'));
+                $email = $this->input->post('email');
+                $password = $this->input->post('password');
+                $if_done = $this->dbmodel->login($email, $password);
+                if (!$if_done) {
+                    $this->session->set_flashdata('login_message', 'Invalid Username/Password');
+                    //Add the route back to register page
+                    redirect(base_url('index.php/main/login'));
+                } else {
+                    $this->session->set_userdata('email', $email);
+                    redirect(base_url('index.php/main/dashboard'));
+                }
             } else {
-                redirect(base_url('/'));
-
+                $this->load->view('login');
             }
 
         }
+    }
+
+    public function dashboard()
+    {
+        $this->load->view('dashboard');
     }
 
     public function create_campaign()
@@ -163,7 +177,7 @@ class Main extends CI_Controller
         $passdata['approved_campaigns'] = $this->dbmodel->approved_campaigns($email);
         $passdata['submitted_campaign'] = $this->dbmodel->submitted_campaign($email);
         $passdata['completed_campaigns'] = $this->dbmodel->completed_campaigns($email);
-        $this->load->view('campaign_page', $passdata);
+        $this->load->view('campaigns', $passdata);
     }
 
     //Code For Dealing operation on Live campaigns
@@ -233,29 +247,46 @@ class Main extends CI_Controller
         $to = $this->input->post('to');
         $if_done = $this->dbmodel->add_connection($from, $to);
         if (!$if_done) {
-            echo ("success");
-            // $this->session->set_flashdata('complete_for_campaign_message', 'There was some error in storing data!');
-            // redirect(base_url('index.php/main/complete_for_campaign'));
+            $data = array(
+                'status' => false,
+            );
         } else {
-            echo ("error");
-            // $this->session->set_flashdata('complete_for_campaign_message', 'Campaign completed successfully');
-            // redirect(base_url('index.php/main/complete_for_campaign'));
+            $data = array(
+                'status' => true,
+            );
         }
+        echo json_encode($data);
     }
 
-    public function explore()
+    public function social()
     {
-        $passdate['profiles'] = $this->dbmodel->explore();
-        $this->load->view('explore', $passdata);
+        $email = $this->session->userdata('email');
+        $passdata['explores'] = $this->dbmodel->explore($email);
+        $passdata['connections'] = $this->dbmodel->connections($email);
+        $this->load->view('social', $passdata);
     }
 
     public function profile()
     {
         $email = $this->session->userdata('email');
-        $passdate['user_profile'] = $this->dbmodel->profile($email);
+        $passdata['user_profile'] = $this->dbmodel->profile($email);
         $this->load->view('profile', $passdata);
     }
 
+    public function update_profile()
+    {
+        $email = $this->session->userdata('email');
+        $fullname = $this->input->post('fullname');
+        $mobile = $this->input->post('mobile');
+        $city = $this->input->post('city');
+        $state = $this->input->post('state');
+        $primary_foi = $this->input->post('primary_foi');
+        $secondary_foi_1 = $this->input->post('secondary_foi_1');
+        $secondary_foi_2 = $this->input->post('secondary_foi_2');
+        $description = $this->input->post('description');
+        $if_done = $this->dbmodel->update_profile($email, $fullname, $mobile, $city, $state, $primary_foi, $secondary_foi_1, $secondary_foi_2, $description);
+        redirect(base_url('index.php/main/profile'));
+    }
     public function update_password()
     {
         $email = $this->session->userdata('email');
